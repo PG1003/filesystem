@@ -1,7 +1,8 @@
 # filesystem for Lua - Reference
 
-This reference is based on the [cppreference.com filesystem](https://en.cppreference.com/w/cpp/filesystem) documentation.
+This reference is a summary based on the [cppreference.com filesystem](https://en.cppreference.com/w/cpp/filesystem) documentation.
 It has been adapted and simplified for this filesystem Lua module.
+For the details 
 
 ## Contents
 
@@ -12,7 +13,7 @@ It has been adapted and simplified for this filesystem Lua module.
 [copy_symlink](#copy_symlink-from-to-)  
 [copy_options](#copy_options)  
 [create_directory](#create_directory-p-existing-)  
-[create_directories](#create_directory-p-)  
+[create_directories](#create_directories-p-)  
 [create_directory_symlink](#create_directory_symlink-target-link-)  
 [create_symlink](#create_symlink-target-link-)  
 [current_path](#current_path-p-)  
@@ -39,11 +40,20 @@ It has been adapted and simplified for this filesystem Lua module.
 [directory_options](#directory_options)  
 [exists](#exists-p-)  
 [equivalent](#equivalent-p1-p2-)  
-[file_size](file_size-p-)  
+[file_size](#file_size-p-)  
 [file_time](#file_time)  
 [file_time_now](#file_time_now)  
 [file_type](#file_type)  
 [hard_link_count](#hard_link_count-p-)  
+[is_block_file](#-p-)  
+[is_character_file](#is_character_file-p-)  
+[is_directory](#is_directory-p-)  
+[is_empty](#is_empty-p-)  
+[is_fifo](#is_fifo-p-)  
+[is_other](#is_other-p-)  
+[is_regular_file](#is_regular_file-p-)  
+[is_socket](#is_socket-p-)  
+[is_symlink](#is_symlink-p-)  
 [last_write_time](#last_write_time-p-new_time-)  
 [permissions](#permissions-p-perms-perm_options-)  
 [perms](#perms)  
@@ -96,6 +106,7 @@ It has been adapted and simplified for this filesystem Lua module.
 [resize_file](#resize_file-p-new_size-)  
 [space](#space-p-)  
 [status](#status-p-)  
+[status_known](#status_known-p-)  
 [symlink_status](#symlink_status-p-)  
 [temp_directory_path](#temp_directory_path)  
 [weakly_canonical](#weakly_canonical-p-)  
@@ -124,7 +135,7 @@ Copies a symlink to another location.
 
 ### `copy_options`
 
-`copy_options` has members that are constants which are used to control the behavior of the [copy](#copy-from-to-copy_options-) and [copy_file](#copy_file-from-to-copy_options-) functions.
+`copy_options` is an enumeration with constants which are used to control the behavior of the [copy](#copy-from-to-copy_options-) and [copy_file](#copy_file-from-to-copy_options-) functions.
 Its members support binary operators to combine, mask or check the options.
 
 You can combine only one option from each option group below.
@@ -205,9 +216,12 @@ end
 
 `entry` is a [directory_entry](#directory_entry-p-) object.
 
+See also the [recursive_directory](#recursive_directory-p-directory_options-) function.
+
 ### `directory_entry( [p] )`
 
-Creates a new directory_entry object from `p`.
+Creates a new `directory_entry` object from `p`.
+A `directory_entry` hold (cached) information of an entry in the filesystem.
 A default empty directory_entry object is created when called without parameters.
 
 ### `directory_entry:assign( p )`
@@ -349,7 +363,7 @@ Returns a [file_time](#file_time) object with the current time.
 
 ### `file_type`
 
-`file_type` has members that are constants which are used to identify the type of the entry on the filesystem.
+`file_type` is an enummeration with constants which are used to identify the type of the entry on the filesystem.
 
 The supported file types are;
 
@@ -372,6 +386,42 @@ Depending on the implementation and platform the `file_type` returned by functio
 
 Returns the number of hard links for `p`.
 
+### `is_block_file( p )`
+
+Tests if `p` refers to block device.
+
+### `is_character_file( p )`
+
+Tests if `p` refers to a character device.
+
+### `is_directory( p )`
+
+Tests if `p` refers to a directory.
+
+### `is_empty( p )`
+
+Tests if `p` refers to an empty file or directory.
+
+### `is_fifo( p )`
+
+Tests if `p` refers to a named pipe.
+
+### `is_other( p )`
+
+Tests if `p` refers to an other file.
+
+### `is_regular_file( p )`
+
+Tests if `p` refers to a regular file.
+
+### `is_socket( p )`
+
+Tests if `p` refers to a named IPC socket.
+
+### `is_symlink( p )`
+
+Tests if `p` refers to a symbolic link.
+
 ### `last_write_time( p, [new_time] )`
 
 Sets the the time of the last modification to `new_time` for `p`.
@@ -385,7 +435,7 @@ By default `perms` will replace the current permissions when `perm_options` is n
 
 ### `perms`
 
-`perms` holds members that are constants which represents file access permissions.
+`perms` is an enummeration with constants which represents file access permissions.
 Its members support binary operators to combine, mask or check permissions.
 
 | Permission     | Meaning |
@@ -411,7 +461,7 @@ Its members support binary operators to combine, mask or check permissions.
 
 ### `perm_options`
 
-`perm_options` holds constants that control the behavior of the function [permissions](#permissions-p-perms-perm_options-).
+`perm_options` is an enummeration with constants that control the behavior of the function [permissions](#permissions-p-perms-perm_options-).
 The options support binary operators to combine, mask or check options.
 
 | Option     | Meaning |
@@ -425,6 +475,7 @@ The options support binary operators to combine, mask or check options.
 
 Creates a new path object from `p`.
 A default empty path object is created when called without parameters.
+`p` can be another path object or a string.
 
 ### `path:append( p )`
 
@@ -593,6 +644,8 @@ end
 In this example `state` is a [recursive_directory_iterator_state](#recursive_directory_iterator_state) object that let you control the recursion.
 `entry` is a [directory_entry](#directory_entry-p-) object.
 
+See also the [directory](#directory-p-directory_options-) function.
+
 ### `recursive_directory_iterator_state`
 
 An object that controls the recursive direcotry iteration
@@ -657,6 +710,10 @@ Returns 3 values, in order;
 
 Returns the permissions and type (in that order) of the filesystem entity refered by `p`.
 Symbolic links are followed.
+
+### `status_known( p )`
+
+Tests if the file status of `p` is known.
 
 ### `symlink_status( p )`
 

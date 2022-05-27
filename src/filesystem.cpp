@@ -949,24 +949,13 @@ CATCH_BAD_ALLOC
 CATCH_FILESYSTEM_ERROR
 END_PROTECTED_FUNCTION
 
-BEGIN_FUNCTION( recursive_directory_iterator_gc )
+BEGIN_FUNCTION( rdi_gc )
     auto self = &pg::to_user_data< pg::recursive_directory_iterator >( L, 1 );
 
     self->~pair< std::filesystem::recursive_directory_iterator, const std::filesystem::recursive_directory_iterator >();
 
     return 0;
 END_FUNCTION
-
-struct recursive_directory_iterator_state
-{
-    static constexpr const luaL_Reg operators[] =
-    {
-        { "__gc", recursive_directory_iterator_gc },
-        { NULL,   NULL }
-    };
-
-    static constexpr const luaL_Reg * methods = nullptr;
-};
 
 BEGIN_FUNCTION( rdi_options )
     const auto & self = pg::to_user_data< pg::recursive_directory_iterator >( L, 1 );
@@ -1024,14 +1013,23 @@ BEGIN_FUNCTION( rdi_disable_recursion_pending )
     return pg::return_nothing( L );
 END_FUNCTION
 
-static constexpr const luaL_Reg recursive_directory_iterator_methods[] =
+struct recursive_directory_iterator_state
 {
-    { "options",                   rdi_options },
-    { "depth",                     rdi_depth },
-    { "recursion_pending",         rdi_recursion_pending },
-    { "pop",                       rdi_pop },
-    { "disable_recursion_pending", rdi_disable_recursion_pending },
-    { NULL,   NULL }
+    static constexpr const luaL_Reg operators[] =
+    {
+        { "__gc", rdi_gc },
+        { NULL,   NULL }
+    };
+
+    static constexpr const luaL_Reg methods[] =
+    {
+        { "options",                   rdi_options },
+        { "depth",                     rdi_depth },
+        { "recursion_pending",         rdi_recursion_pending },
+        { "pop",                       rdi_pop },
+        { "disable_recursion_pending", rdi_disable_recursion_pending },
+        { NULL,   NULL }
+    };
 };
 
 BEGIN_PROTECTED_FUNCTION( next_recursive_directory_element )

@@ -20,7 +20,22 @@ local _test_paths = {
 local function _directory_iterator()
     local t = {}
     for e in fs.directory( "./test/tests/foo" ) do
-        print( e )
+        t[ tostring( e ) ] = true
+    end
+
+    local count = 0
+    for p, d in pairs( _test_paths ) do
+        if d == 0 then
+            count = count + 1
+            test.is_true( t[ p ] )
+        end
+    end
+end
+
+local function _directory_iterator_with_options()
+    local t = {}
+    local options = fs.directory_options.skip_permission_denied | fs.directory_options.follow_directory_symlink
+    for e in fs.directory( "./test/tests/foo", options ) do
         t[ tostring( e ) ] = true
     end
 
@@ -47,8 +62,9 @@ end
 
 local tests =
 {
-    directory_iterator           = _directory_iterator,
-    recursive_directory_iterator = _recursive_directory_iterator
+    directory_iterator              = _directory_iterator,
+    directory_iterator_with_options = _directory_iterator_with_options,
+    recursive_directory_iterator    = _recursive_directory_iterator
 }
 
 return tests

@@ -2,6 +2,17 @@
 
 A Lua filesystem module based on the std::filesystem C++ standard library.
 
+## Features
+
+The filesystem module supports the same features as std::filesystem does.
+
+This includes the following;
+* File operations such as copy, remove and renaming.
+* Iterating (recursively) through direcotries.
+* Create and remove symbolic links and hard links.
+* Query the information about a file like permissions and type of the entity.
+* Modifying permissions.
+
 ## Requirements
 
 * Lua version 5.3 or 5.4
@@ -87,7 +98,7 @@ local success, result = pcall( may_fail,
 --   when the error was caused by the filesystem module.
 ```
 
-## Building
+## Building the filesystem Lua module
 
 You can build the module by executing the following command in the project directory;
 ``` sh

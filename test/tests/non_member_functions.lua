@@ -229,6 +229,9 @@ local function _last_write_time()
     
     test.is_not_same( fs.last_write_time( p ), ft2 )
     test.is_same( fs.last_write_time( str ), ft3 )
+
+    local ft4 = ft3 - 1
+    test.is_same( ft3 - ft4, 1 )
 end
 
 local function _file_time_now()

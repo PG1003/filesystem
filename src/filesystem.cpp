@@ -51,9 +51,9 @@ using directory_iterator           = std::pair< std::filesystem::directory_itera
 using recursive_directory_iterator = std::pair< std::filesystem::recursive_directory_iterator, const std::filesystem::recursive_directory_iterator >;
 
 static constexpr const char path_meta_traits[]                         = "path.filesystem";
-static constexpr const char path_iterator_meta_traits[]                = "itereator.path.filesystem";
-static constexpr const char directory_iterator_meta_traits[]           = "directory_iterator.filesystem";
-static constexpr const char recursive_directory_iterator_meta_traits[] = "recursive_directory_iterator.filesystem";
+static constexpr const char path_iterator_meta_traits[]                = "path_iterator_state.filesystem";
+static constexpr const char directory_iterator_meta_traits[]           = "directory_iterator_state.filesystem";
+static constexpr const char recursive_directory_iterator_meta_traits[] = "recursive_directory_iterator_state.filesystem";
 static constexpr const char directory_entry_meta_traits[]              = "directory_entry.path.filesystem";
 static constexpr const char directory_options_meta_traits[]            = "directory_options.path.filesystem";
 static constexpr const char copy_options_meta_traits[]                 = "copy_options.filesystem";
@@ -676,14 +676,28 @@ BEGIN_FUNCTION( ft_add )
 END_FUNCTION
 
 BEGIN_FUNCTION( ft_sub )
+    using duration = std::filesystem::file_time_type::duration;
+    using period   = std::filesystem::file_time_type::period;
+    using rep      = std::filesystem::file_time_type::rep;
+
     const auto & left  = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 1 );
-    const auto & right = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 2 );
+    if( lua_isnumber( L, 2 ) )
+    {
+        const auto seconds = lua_tonumber( L, 2 );
+        const auto count   = static_cast< rep >( seconds * period::den / period::num );
+        
+        return pg::return_new_user_data< std::filesystem::file_time_type >( L, left - duration( count ) );
+    }
+    else
+    {
+        const auto & right = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 2, "file_time or number" );
 
-    const auto count     = ( left - right ).count();
-    const auto count_num = static_cast< lua_Number >( count * std::filesystem::file_time_type::period::num );
-    const auto seconds   = count_num / std::filesystem::file_time_type::period::den;
+        const auto count     = ( left - right ).count();
+        const auto count_num = static_cast< lua_Number >( count * std::filesystem::file_time_type::period::num );
+        const auto seconds   = count_num / std::filesystem::file_time_type::period::den;
 
-    return pg::return_number( L, seconds );
+        return pg::return_number( L, seconds );
+    }
 END_FUNCTION
 
 struct fs_file_time

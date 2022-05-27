@@ -1,6 +1,6 @@
 # filesystem for Lua - Reference
 
-This reference is based on the [cppreference.com](https://en.cppreference.com/w/cpp/filesystem) filesystem library documentation.
+This reference is based on the [cppreference.com filesystem](https://en.cppreference.com/w/cpp/filesystem) documentation.
 It has been adapted and simplified for this filesystem Lua module.
 
 ## Contents
@@ -8,10 +8,15 @@ It has been adapted and simplified for this filesystem Lua module.
 [absolute](#absolute-p-)  
 [canonical](#canonical-p-)  
 [copy](#copy-from-to-copy_options-)  
-[copy_file](#copy_file-from-to-copy_options_)  
+[copy_file](#copy_file-from-to-copy_options-)  
+[copy_symlink](#copy_symlink-from-to-)  
 [copy_options](#copy_options)  
+[create_directory](#create_directory-p-existing-)  
+[create_directories](#create_directory-p-)  
+[create_directory_symlink](#create_directory_symlink-target-link-)  
+[create_symlink](#create_symlink-target-link-)  
 [current_path](#current_path-p-)  
-[directory](#directory_p_directory_options_)  
+[directory](#directory-p-directory_options-)  
 [directory_entry](#directory_entry-p-)  
 [directory_entry:assign](#directory_entryassign-p-)  
 [directory_entry:replace_filename](#directory_entryreplace_filename-p-)  
@@ -31,20 +36,27 @@ It has been adapted and simplified for this filesystem Lua module.
 [directory_entry:last_write_time](#directory_entrylast_write_time)  
 [directory_entry:status](#directory_entrystatus)  
 [directory_entry:symlink_status](#directory_entrysymlink_status)  
-[directory_options](#directory-p-options-)  
+[directory_options](#directory_options)  
+[exists](#exists-p-)  
+[equivalent](#equivalent-p1-p2-)  
+[file_size](file_size-p-)  
+[file_time](#file_time)  
+[file_time_now](#file_time_now)  
 [file_type](#file_type)  
+[hard_link_count](#hard_link_count-p-)  
+[last_write_time](#last_write_time-p-new_time-)  
 [permissions](#permissions-p-perms-perm_options-)  
 [perms](#perms)  
 [perm_options](#perm_options)  
 [path](#path-p-)  
 [path:append](#pathappend-p-)  
 [path:clear](#pathclear)  
-[path:compare](#pathcompare_p_)  
+[path:compare](#pathcompare-p-)  
 [path:concat](#pathconcat-p-)  
 [path:elements](#pathelements)  
 [path:empty](#pathempty)  
 [path:extension](#pathextension)  
-[path:fileiname](#pathfilename)  
+[path:filename](#pathfilename)  
 [path:has_extension](#pathhas_extension)  
 [path:has_filename](#pathhas_filename)  
 [path:has_parent_path](#pathhas_parent_path)  
@@ -69,6 +81,7 @@ It has been adapted and simplified for this filesystem Lua module.
 [path:replace_filename](#pathreplace_filename-repl-)  
 [path:stem](#pathstem)  
 [proximate](#proximate-p-base-)  
+[read_symlink](#read_symlink-p-)  
 [recursive_directory](#recursive_directory-p-directory_options-)  
 [recursive_directory_iterator_state](#recursive_directory_iterator_state)  
 [recursive_directory_iterator_state:depth](#recursive_directory_iterator_statedepth)  
@@ -77,6 +90,14 @@ It has been adapted and simplified for this filesystem Lua module.
 [recursive_directory_iterator_state:recursion_pending](#recursive_directory_iterator_staterecursion_pending)  
 [recursive_directory_iterator_state:pop](#recursive_directory_iterator_statepop)  
 [relative](#relative-p-base-)  
+[remove](#remove-p-)  
+[remove_all](#remove_all-p-)  
+[rename](#rename-old-new-)  
+[resize_file](#resize_file-p-new_size-)  
+[space](#space-p-)  
+[status](#status-p-)  
+[symlink_status](#symlink_status-p-)  
+[temp_directory_path](#temp_directory_path)  
 [weakly_canonical](#weakly_canonical-p-)  
 
 ### `absolute( p )`
@@ -86,16 +107,20 @@ Returns a path object with a absolute reference to the same file system location
 ### `canonical( p )`
 
 Converts path `p` to a canonical absolute path, i.e. an absolute path that has no dot, dot-dot elements or symbolic links in its generic format representation.
-If `p` is not an absolute path, the function behaves as if it is first made absolute by [#absolute](#absolute) function.
+If `p` is not an absolute path, the function behaves as if it is first made absolute by [absolute](#absolute-p-) function.
 The path `p` must exist.
 
 ### `copy( from, to, [copy_options] )`
 
-Copies the file or directory `from` to file or directory `to`, using the options indicated by `copy_options`.
+Copies the file or directory `from` to file or directory `to`, using the [options](#copy_options) indicated by `copy_options`.
 
 ### `copy_file( from, to, [copy_options] )`
 
-Copies a single file from `from` to `to`, using the options indicated by `copy_options`.
+Copies a single file from `from` to `to`, using the [options](#copy_options) indicated by `copy_options`.
+
+### `copy_symlink( from, to )`
+
+Copies a symlink to another location.
 
 ### `copy_options`
 
@@ -138,25 +163,60 @@ For example the result a copy with the options `skip_existing` and `overwrite_ex
 | `create_symlinks`   | Instead of creating copies of files, create symlinks pointing to the originals. Note: the source path must be an absolute path unless the destination path is in the current directory. |
 | `create_hard_links` | Instead of creating copies of files, create hardlinks that resolve to the same files as the originals |
 
+### `create_directory( p, [existing] )
+
+Creates a directory `p`.
+The attributes of the new directory are copied from optional `existing` directory which must be a valid path.
+The new directory will have the `perms.all` attributes set when `existing` is omitted.  
+Returns a boolean to indicate if a directory was created.
+
+### `create_directories( p )
+
+Creates a directories for every element `p` that does not already esist.  
+Returns a boolean to indicate if directories were created.
+
+### `create_directory_symlink( target, link )`
+
+Creates a symbolic link `link` with its target set to `target` as if by POSIX symlink(): the pathname target may be invalid or non-existing.
+Some operating systems require symlink creation to identify that the link is to a directory.
+Portable code should use this function to create directory symlinks rather than [create_symlink](#create_symlink-target-link-).
+
+### `create_symlink( target, link )`
+
+Creates a symbolic link `link` with its target set to `target` as if by POSIX symlink(): the pathname target may be invalid or non-existing.
+
 ### `current_path( [p] )`
 
+Returns the current path when called without `p`.  
+When called with `p`, `p` is set as the current path.
 
+### `directory( p, [directory_options] )`
+
+Enables recusive over entries in a directory by using a generic for-loop.
+The default for `directory_options` is `fs.directory_options.none`.
+
+``` lua
+local fs = require( filesystem )
+
+for entry in fs.recursive_directory( "my_directory" ) do
+    print( entry )
+end
+```
+
+`entry` is a [directory_entry](#directory_entry-p-) object.
 
 ### `directory_entry( [p] )`
 
 Creates a new directory_entry object from `p`.
-`p` can be a string or a path object.
 A default empty directory_entry object is created when called without parameters.
 
 ### `directory_entry:assign( p )`
 
-Assigns contents to the `directory_entry` object.
-`p` can be a string or a path object.
+Assigns `p` as the contents to the `directory_entry` object.
 
 ### `directory_entry:replace_filename( p )`
 
 Replaces the filename with extention by `p` of the `directory_entry` object and calls refresh to update the cached attributes.
-`p` can be a string or a path object.
 
 ### `directory_entry:refresh()`
 
@@ -236,11 +296,11 @@ for entry in fs.directory( "my_directory", fs.directory_options.skip_permission_
 end
 ```
 
-In this example `entry` is a [directory_entry](#directory_entry) object.
+In this example `entry` is a [directory_entry](#directory_entry-p-) object.
 
 ### `directory_options`
 
-`directory_options` has members that are constants which are used to control the behavior of the [directory](#directory_p__directory_options__) and [recursive_directory](#recursive_directory_p__directory_options__) functions.
+`directory_options` has members that are constants which are used to control the behavior of the [directory](#directory-p-directory_options-) and [recursive_directory](#recursive_directory-p-directory_options-) functions.
 Its members support binary operators to combine, mask or check the options.
 
 | Option                   | Meaning |
@@ -248,6 +308,44 @@ Its members support binary operators to combine, mask or check the options.
 | none                     | Skip directory symlinks, permission denied is error |
 | follow_directory_symlink | Follow rather than skip directory symlinks |
 | skip_permission_denied   | Skip directories that would otherwise result in permission denied errors|
+
+### `exists( p )`
+
+Checks if path `p` corresponds to an existing file or directory.
+
+### `equivalent( p1, p2 )
+
+Checks if the paths `p1` and `p2` resolve to the same file system entity.
+
+### `file_size( p )`
+
+Returns the size in bytes of the file `p` (symlinks are followed).
+The size of a directory (as well as any other file that is not a regular file or a symlink) is implementation-defined.
+
+### `file_time`
+
+An object that holds the time modified when returned by [last_write_time](#last_write_time-p-new_time-) or [directory_entry:last_write_time](#directory_entrylast_write_time).
+When returned by [file_time_now](#file_time_now) it holds the time at the moment of the function call.
+
+The `file_time` object supports limited arithmatic such as subtracting two `file_time` objects to get a time difference (which is a regular Lua number).
+You can also add an offset (in seconds) to a `file_time` object.
+
+``` lua
+local fs  = require( "filesystem" )
+local p   = fs.path( "my_file.txt" )
+local ft  = fs.last_write_time( p )
+local now = fs.file_time_now()
+
+-- calculate how many seconds ago the file was modified
+local modified_seconds_ago = now - ft
+
+-- set new modified time one second ago
+fs.last_write_time( p, now - 1 )
+```
+
+### `file_time_now()`
+
+Returns a [file_time](#file_time) object with the current time.
 
 ### `file_type`
 
@@ -269,6 +367,15 @@ The supported file types are;
 | `unknown`   | The file exists but its type could not be determined |
 
 Depending on the implementation and platform the `file_type` returned by functions may nothold a value that is not listed.
+
+### `hard_link_count( p )`
+
+Returns the number of hard links for `p`.
+
+### `last_write_time( p, [new_time] )`
+
+Sets the the time of the last modification to `new_time` for `p`.
+Returns the time of the last modification of `p` when called without `new_time`.
 
 ### `permissions( p, perms, [perm_options] )`
 
@@ -317,7 +424,6 @@ The options support binary operators to combine, mask or check options.
 ### `path( [p] )`
 
 Creates a new path object from `p`.
-`p` can be a string or another path object.
 A default empty path object is created when called without parameters.
 
 ### `path:append( p )`
@@ -332,7 +438,6 @@ Erases the contents of `path`.
 ### `path:compare( p )`
 
 Compares the lexical representations of `path` and `p` lexicographically.
-`p` can be a string or another path object.
 
 ### `path:concat( p )`
 
@@ -467,11 +572,14 @@ Returns a path which is `p` that is relative to base.
 Tries to resolve symlinks and normalizes with [weakly_canonical](#weakly_canonical-p-) and [path:lexically_proximate](#pathlexically_proximate-base-) for `p` and `base` before other processing.
 Default for `base` when it's not provided is the result of [current_path](#current_path-p-).
 
+### `read_symlink( p )`
+
+Returns a path object which refers to the target of a symbolic link at `p`.
+
 ### `recursive_directory( p, [directory_options] )`
 
 Enables recusive iteration over entries in a directory and its subdirectories by using a generic for-loop.
 The default for `directory_options` is `fs.directory_options.none`.
-`p` can be a path object or a string.
 
 ``` lua
 local fs = require( filesystem )
@@ -483,7 +591,7 @@ end
 ```
 
 In this example `state` is a [recursive_directory_iterator_state](#recursive_directory_iterator_state) object that let you control the recursion.
-`entry` is a [directory_entry](#directory_entry) object.
+`entry` is a [directory_entry](#directory_entry-p-) object.
 
 ### `recursive_directory_iterator_state`
 
@@ -515,6 +623,48 @@ Moves one level up in the directory hierarchy.
 Returns a path which is `p` that is relative to base.
 Resolves symlinks and normalizes both `p` and `base` before other processing.
 Default for `base` when it's not provided is the result of [current_path](#current_path-p-).
+
+### `remove( p )`
+
+Removes entity refered by `p`.  
+Returns a boolean to indicate if the entity was deleted.
+
+### `remove_all( p )`
+
+Deletes the contents of `p` (if it is a directory) and the contents of all its subdirectories, recursively, then deletes `p` itself.  
+Returns the number of entityes that were deleted.
+
+### `rename( old, new )`
+
+Moves or renames the filesystem `old` to `new`.
+
+### `resize_file( p, new_size )`
+
+Changes the size of a file refered by `p` to `new_size`.
+If the file size was previously larger than `new_size`, the remainder of the file is discarded.
+If the file was previously smaller than `new_size`, the file size is increased and the new area appears as if zero-filled.
+
+### `space( p )`
+
+Determines the information about the filesystem on which the pathname `p` is located.  
+
+Returns 3 values, in order;
+* Total size of the filesystem in bytes
+* free space on the filesystem in bytes
+* Free space available to a non-privileged process (may be equal or less than free) )
+
+### `status( p )`
+
+Returns the permissions and type (in that order) of the filesystem entity refered by `p`.
+Symbolic links are followed.
+
+### `symlink_status( p )`
+
+Returns the permissions and type (in that order) of the symbolic link refered by `p`.
+
+### `temp_directory_path()`
+
+Returns the directory location suitable for temporary files.
 
 ### `weakly_canonical( p )`
 

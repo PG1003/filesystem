@@ -5,84 +5,107 @@ It has been adapted and simplified for this filesystem Lua module.
 
 ## Contents
 
-[copy](#copy_from_to__copy_options__)  
-[copy_file](#copy_file_from_to__copy_options__)  
+[absolute](#absolute-p-)  
+[canonical](#canonical-p-)  
+[copy](#copy-from-to-copy_options-)  
+[copy_file](#copy_file-from-to-copy_options_)  
 [copy_options](#copy_options)  
-[directory](#directory_p__directory_options__)  
-[directory_entry](#directory_entry__p__)  
-[directory_entry:assign](#directory_entry_assign_p_)  
-[directory_entry:replace_filename](#directory_entry_replace_filename_p_)  
-[directory_entry:refresh](#directory_entry_refresh__)  
-[directory_entry:path](#directory_entry_path__)  
-[directory_entry:exists](#directory_entry_exists__)  
-[directory_entry:is_block_file](#directory_entry_is_block_file__)  
-[directory_entry:is_character_file](#directory_entry_is_character_file__)  
-[directory_entry:is_directory](#directory_entry_is_directory__)  
-[directory_entry:is_fifo](#directory_entry_is_fifo__)  
-[directory_entry:is_other](#directory_entry_is_other__)  
-[directory_entry:is_regular_file](#directory_entry_is_regular_file__)  
-[directory_entry:is_socket](#directory_entry_is_socket__)  
-[directory_entry:is_symlink](#directory_entry_is_symlink__)  
-[directory_entry:file_size](#directory_entry_file_size__)  
-[directory_entry:hard_link_count](#directory_entry_hard_link_count__)  
-[directory_entry:last_write_time](#directory_entry_last_write_time__)  
-[directory_entry:status](#directory_entry_status__)  
-[directory_entry:symlink_status](#directory_entry_symlink_status__)  
-[directory_options](#directory_options)  
+[current_path](#current_path-p-)  
+[directory](#directory_p_directory_options_)  
+[directory_entry](#directory_entry-p-)  
+[directory_entry:assign](#directory_entryassign-p-)  
+[directory_entry:replace_filename](#directory_entryreplace_filename-p-)  
+[directory_entry:refresh](#directory_entryrefresh)  
+[directory_entry:path](#directory_entrypath)  
+[directory_entry:exists](#directory_entryexists)  
+[directory_entry:is_block_file](#directory_entryis_block_file)  
+[directory_entry:is_character_file](#directory_entryis_character_file)  
+[directory_entry:is_directory](#directory_entryis_directory)  
+[directory_entry:is_fifo](#directory_entryis_fifo)  
+[directory_entry:is_other](#directory_entryis_other)  
+[directory_entry:is_regular_file](#directory_entryis_regular_file)  
+[directory_entry:is_socket](#directory_entryis_socket)  
+[directory_entry:is_symlink](#directory_entryis_symlink)  
+[directory_entry:file_size](#directory_entryfile_size)  
+[directory_entry:hard_link_count](#directory_entryhard_link_count)  
+[directory_entry:last_write_time](#directory_entrylast_write_time)  
+[directory_entry:status](#directory_entrystatus)  
+[directory_entry:symlink_status](#directory_entrysymlink_status)  
+[directory_options](#directory-p-options-)  
 [file_type](#file_type)  
+[permissions](#permissions-p-perms-perm_options-)  
 [perms](#perms)  
 [perm_options](#perm_options)  
-[path](#path_p_)  
-[path:append](#path_append__p__)  
-[path:clear](#path_clear__)  
-[path:compare](#path_compare_p_)  
-[path:concat](#path_concat_p_)  
-[path:elements](#path_elements__)  
-[path:empty](#path_empty__)  
-[path:extension](#path_extension__)  
-[path:fileiname](#path_filename__)  
-[path:has_extension](#path_has_extension__)  
-[path:has_filename](#path_has_filename__)  
-[path:has_parent_path](#path_has_parent_path__)  
-[path:has_relative_path](#path_has_relative_path__)  
-[path:has_root_directory](#path_has_root_directory__)  
-[path:has_root_name](#path_has_root_name__)  
-[path:has_root_path](#path_has_root_path__)  
-[path:has_stem](#path_has_stem__)  
-[path:is_absolute](#path_is_absolute__)  
-[path:is_relative](#path_is_relative__)  
-[path:lexically_normal](#path_lexically_normal__)  
-[path:lexically_proximate](#path_lexically_proximate_base_)  
-[path:lexically_relative](#path_lexically_relative_base_)  
-[path:make_preferred](#path_make_preferred__)  
-[path:parent_path](#path_parent_path__)  
-[path:relative_path](#path_relative_path__)  
-[path:remove_filename](#path_remove_filename__)  
-[path:root_directory](#path_root_directory__)  
-[path:root_name](#path_root_name__)  
-[path:root_path](#path_root_path__)  
-[path:replace_extension](#path_replace_extension__ext__)  
-[path:replace_filename](#path_replace_filename_repl_)  
-[path:stem](#path_stem__)  
-[recursive_directory](#recursive_directory_p__directory_options__)  
+[path](#path-p-)  
+[path:append](#pathappend-p-)  
+[path:clear](#pathclear)  
+[path:compare](#pathcompare_p_)  
+[path:concat](#pathconcat-p-)  
+[path:elements](#pathelements)  
+[path:empty](#pathempty)  
+[path:extension](#pathextension)  
+[path:fileiname](#pathfilename)  
+[path:has_extension](#pathhas_extension)  
+[path:has_filename](#pathhas_filename)  
+[path:has_parent_path](#pathhas_parent_path)  
+[path:has_relative_path](#pathhas_relative_path)  
+[path:has_root_directory](#pathhas_root_directory)  
+[path:has_root_name](#pathhas_root_name)  
+[path:has_root_path](#pathhas_root_path)  
+[path:has_stem](#pathhas_stem)  
+[path:is_absolute](#pathis_absolute)  
+[path:is_relative](#pathis_relative)  
+[path:lexically_normal](#pathlexically_normal)  
+[path:lexically_proximate](#pathlexically_proximate-base-)  
+[path:lexically_relative](#pathlexically_relative-base-)  
+[path:make_preferred](#pathmake_preferred)  
+[path:parent_path](#pathparent_path)  
+[path:relative_path](#pathrelative_path)  
+[path:remove_filename](#pathremove_filename)  
+[path:root_directory](#pathroot_directory)  
+[path:root_name](#pathroot_name)  
+[path:root_path](#pathroot_path)  
+[path:replace_extension](#pathreplace_extension-ext-)  
+[path:replace_filename](#pathreplace_filename-repl-)  
+[path:stem](#pathstem)  
+[proximate](#proximate-p-base-)  
+[recursive_directory](#recursive_directory-p-directory_options-)  
+[recursive_directory_iterator_state](#recursive_directory_iterator_state)  
+[recursive_directory_iterator_state:depth](#recursive_directory_iterator_statedepth)  
+[recursive_directory_iterator_state:disable_recurion_pending](#recursive_directory_iterator_statedisable_recurion_pending)  
+[recursive_directory_iterator_state:options](#recursive_directory_iterator_stateoptions)  
+[recursive_directory_iterator_state:recursion_pending](#recursive_directory_iterator_staterecursion_pending)  
+[recursive_directory_iterator_state:pop](#recursive_directory_iterator_statepop)  
+[relative](#relative-p-base-)  
+[weakly_canonical](#weakly_canonical-p-)  
 
+### `absolute( p )`
 
+Returns a path object with a absolute reference to the same file system location as `p`.
 
+### `canonical( p )`
+
+Converts path `p` to a canonical absolute path, i.e. an absolute path that has no dot, dot-dot elements or symbolic links in its generic format representation.
+If `p` is not an absolute path, the function behaves as if it is first made absolute by [#absolute](#absolute) function.
+The path `p` must exist.
 
 ### `copy( from, to, [copy_options] )`
 
-
+Copies the file or directory `from` to file or directory `to`, using the options indicated by `copy_options`.
 
 ### `copy_file( from, to, [copy_options] )`
 
-
+Copies a single file from `from` to `to`, using the options indicated by `copy_options`.
 
 ### `copy_options`
 
-`copy_options` has members that are constants which are used to control the behavior of the [copy](#copy_from_to__copy_options__) and [copy_file](#copy_file_from_to__copy_options__) functions.
+`copy_options` has members that are constants which are used to control the behavior of the [copy](#copy-from-to-copy_options-) and [copy_file](#copy_file-from-to-copy_options-) functions.
 Its members support binary operators to combine, mask or check the options.
 
-#### Options controlling [copy_file](#copy_file_from_to__copy_options__) when the file already exists
+You can combine only one option from each option group below.
+For example the result a copy with the options `skip_existing` and `overwrite_existing` combined is undefined but `overwrite_existing` and `skip_symlinks` is valid.
+
+#### Options controlling [copy_file](#copy_file-from-to-copy_options-) when the file already exists
 
 | Option               | Meaning |
 |----------------------|---------|
@@ -91,14 +114,14 @@ Its members support binary operators to combine, mask or check the options.
 | `overwrite_existing` | Replace the existing file |
 | `update_existing`    | Replace the existing file only if it is older than the file being copied |
 
-#### Options controlling the effects of [copy](#copy_from_to__copy_options__) on subdirectories
+#### Options controlling the effects of [copy](#copy-from-to-copy_options-) on subdirectories
 
 | Option      | Meaning |
 |-------------|---------|
 | `none`      | Skip subdirectories (default behavior) |
 | `recursive` | Recursively copy subdirectories and their content |
 
-#### Options controlling the effects of [copy](#copy_from_to__copy_options__) on symbolic links
+#### Options controlling the effects of [copy](#copy-from-to-copy_options-) on symbolic links
 
 | Option          | Meaning |
 |-----------------|---------|
@@ -106,7 +129,7 @@ Its members support binary operators to combine, mask or check the options.
 | `copy_symlinks` | Copy symlinks as symlinks, not as the files they point to |
 | `skip_symlinks` | Ignore symlinks |
 
-#### Options controlling the kind of copying [copy](#copy_from_to__copy_options__) does
+#### Options controlling the kind of copying [copy](#copy-from-to-copy_options-) does
 
 | Option              | Meaning |
 |---------------------|---------|
@@ -114,6 +137,10 @@ Its members support binary operators to combine, mask or check the options.
 | `directories_only`  | Copy the directory structure, but do not copy any non-directory files |
 | `create_symlinks`   | Instead of creating copies of files, create symlinks pointing to the originals. Note: the source path must be an absolute path unless the destination path is in the current directory. |
 | `create_hard_links` | Instead of creating copies of files, create hardlinks that resolve to the same files as the originals |
+
+### `current_path( [p] )`
+
+
 
 ### `directory_entry( [p] )`
 
@@ -197,7 +224,19 @@ Returns a `perms` and a `file_type` of the symbolic link to which `directory_ent
 
 ### `directory( p, [directory_options] )`
 
+Enables iteration over the entries in a directory by using a generic for-loop.
+The default for `directory_options` is `fs.directory_options.none`.
+`p` can be a path object or a string.
 
+``` lua
+local fs = require( filesystem )
+
+for entry in fs.directory( "my_directory", fs.directory_options.skip_permission_denied ) do
+    print( entry:path():filename() )
+end
+```
+
+In this example `entry` is a [directory_entry](#directory_entry) object.
 
 ### `directory_options`
 
@@ -206,7 +245,7 @@ Its members support binary operators to combine, mask or check the options.
 
 | Option                   | Meaning |
 |--------------------------|---------|
-| none                     | (Default) Skip directory symlinks, permission denied is error |
+| none                     | Skip directory symlinks, permission denied is error |
 | follow_directory_symlink | Follow rather than skip directory symlinks |
 | skip_permission_denied   | Skip directories that would otherwise result in permission denied errors|
 
@@ -230,6 +269,12 @@ The supported file types are;
 | `unknown`   | The file exists but its type could not be determined |
 
 Depending on the implementation and platform the `file_type` returned by functions may nothold a value that is not listed.
+
+### `permissions( p, perms, [perm_options] )`
+
+Changes the permissions of the entry `p` refers to.
+`perms` are the permissions that are applied as specified by `perm_options`.
+By default `perms` will replace the current permissions when `perm_options` is not provided.
 
 ### `perms`
 
@@ -259,7 +304,7 @@ Its members support binary operators to combine, mask or check permissions.
 
 ### `perm_options`
 
-`perm_options` holds constants that control the behavior of the function [permissions](#permissions_p_perms__perm_options__).
+`perm_options` holds constants that control the behavior of the function [permissions](#permissions-p-perms-perm_options-).
 The options support binary operators to combine, mask or check options.
 
 | Option     | Meaning |
@@ -319,35 +364,35 @@ Returns a path object with the filename component of `path`.
 
 ### `path:has_extension()`
 
-Checks if [`path:root_path()`](#path_root_path__) will return an emty result.
+Checks if [`path:root_path()`](#pathroot_path) will return an emty result.
 
 ### `path:has_filename()`
 
-Checks if [`path:has_filename()`](#path_filename__) will return an emty result.
+Checks if [`path:has_filename()`](#pathfilename) will return an emty result.
 
 ### `path:has_parent_path()`
 
-Checks if [`path:parent_path()`](#path_parent_path__) will return an emty result.
+Checks if [`path:parent_path()`](#pathparent_path) will return an emty result.
 
 ### `path:has_relative_path()`
 
-Checks if [`path:relative_path()`](#path_relative_path__) will return an emty result.
+Checks if [`path:relative_path()`](#pathrelative_path) will return an emty result.
 
 ### `path:has_root_directory()`
 
-Checks if [`path:root_directory()`](#path_root_directory__) will return an emty result.
+Checks if [`path:root_directory()`](#pathroot_directory) will return an emty result.
 
 ### `path:has_root_name()`
 
-Checks if [`path:root_name()`](#path_root_name__) will return an emty result.
+Checks if [`path:root_name()`](#pathroot_name) will return an emty result.
 
 ### `path:has_root_path()`
 
-Checks if [`path:root_path()`](#path_root_path__) will return an emty result.
+Checks if [`path:root_path()`](#pathroot_path) will return an emty result.
 
 ### `path:has_stem()`
 
-Checks if [`path:stem()`](#path_stem__) will return an emty result.
+Checks if [`path:stem()`](#pathstem) will return an emty result.
 
 ### `path:is_absolute()`
 
@@ -364,7 +409,7 @@ Retuns the normal form of `path`.
 ### `path:lexically_proximate( base )`
 
 Retuns the proximate form of `path`.
-This function calls `path:lexically_relative( base )` and if this call results in an empty path then the value `path` is returned.
+This function calls [path:lexically_relative](#pathlexically_relative-base-) and if this call results in an empty path then the value `path` is returned.
 
 ### `path:lexically_relative( base )`
 
@@ -416,4 +461,61 @@ Returns the `path` object itself.
 
 Returns the filename identified by the generic-format path stripped of its extension.
 
+### `proximate( p, [base] )`
+
+Returns a path which is `p` that is relative to base.
+Tries to resolve symlinks and normalizes with [weakly_canonical](#weakly_canonical-p-) and [path:lexically_proximate](#pathlexically_proximate-base-) for `p` and `base` before other processing.
+Default for `base` when it's not provided is the result of [current_path](#current_path-p-).
+
 ### `recursive_directory( p, [directory_options] )`
+
+Enables recusive iteration over entries in a directory and its subdirectories by using a generic for-loop.
+The default for `directory_options` is `fs.directory_options.none`.
+`p` can be a path object or a string.
+
+``` lua
+local fs = require( filesystem )
+
+for state, entry in fs.recursive_directory( "my_directory" ) do
+    print( state:depth() )
+    print( entry )
+end
+```
+
+In this example `state` is a [recursive_directory_iterator_state](#recursive_directory_iterator_state) object that let you control the recursion.
+`entry` is a [directory_entry](#directory_entry) object.
+
+### `recursive_directory_iterator_state`
+
+An object that controls the recursive direcotry iteration
+
+### `recursive_directory_iterator_state:depth()`
+
+Returns the number of directories from the starting directory to the currently iterated directory, i.e. the current depth of the directory hierarchy.
+The starting directory has depth of 0, its subdirectories have depth 1, etc.
+
+### `recursive_directory_iterator_state:disable_recurion_pending()`
+
+Disables recursion to the currently referred subdirectory, if any.
+
+### `recursive_directory_iterator_state:options()`
+
+Returns the options set at start of the directory iteration that affect the iteration.
+
+### `recursive_directory_iterator_state:recursion_pending()`
+
+Returns true if the next iteration will cause the directory that is currently referred will be iterated into.
+
+### `recursive_directory_iterator_state:pop()`
+
+Moves one level up in the directory hierarchy.
+
+### `relative( p, [base] )`
+
+Returns a path which is `p` that is relative to base.
+Resolves symlinks and normalizes both `p` and `base` before other processing.
+Default for `base` when it's not provided is the result of [current_path](#current_path-p-).
+
+### `weakly_canonical( p )`
+
+Returns a path composed by results of calling [canonical](#canonical-p-) for the leading elements of `p` that exist (as determined by [status](#status-p-)), followed by the elements of `p` that do not exist.

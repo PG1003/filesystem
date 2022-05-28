@@ -1,16 +1,15 @@
 # filesystem
 
-A Lua filesystem module based on the std::filesystem C++ standard library.
+A filesystem Lua module based on the std::filesystem C++ standard library.
 
 ## Features
 
-The filesystem module supports the same features as std::filesystem does.
-
+The filesystem module supports the same features as std::filesystem does.  
 This includes the following;
 * File operations such as copy, remove and renaming.
 * Iterating (recursively) through direcotries.
 * Create and remove symbolic links and hard links.
-* Query the information about a file like permissions and type of the entity.
+* Querying information about a file like permissions and type of a filesystem entity.
 * Modifying permissions.
 
 ## Requirements
@@ -88,14 +87,16 @@ local function may_fail( src, dst )
 end
 
 -- Execute filesystem operations
-local success, result = pcall( may_fail,
-                               "/home/foo/bar.txt",
-                               "/home/foo/baz.txt" )
+local success, result = pcall( may_fail, "/home/foo/bar.txt", "/home/foo/baz.txt" )
 
 -- No errors occured when 'success' is true. In this case 'result' contains
 --   the return value of 'may_fail' which in this example returns nothing.
 -- If 'success' is false then an error occured and 'result' an error message
 --   when the error was caused by the filesystem module.
+
+if not success then
+    print( result )
+end
 ```
 
 ## Building the filesystem Lua module
@@ -105,12 +106,12 @@ You can build the module by executing the following command in the project direc
 make all
 ```
 
-This library has only [one cpp-file](/src/filesystem.cpp) which enables easy integration into other projects or your own build system.
+This library has only [one cpp-file](/src/filesystem.cpp) without external dependencies which makes easy to integrate it into other projects or your own build system.
 
 ## Tests
 
 There are tests to validate the Lua API of the filesystem module.
-However these tests are written with a Linux OS in mind, so there is no guaranty that all test will pass on other platforms.
+However, these tests are written with a Linux OS in mind, so there is no guaranty that all test will pass on other platforms.
 
 You can find these tests in the [tests](/test/tests) directory.
 

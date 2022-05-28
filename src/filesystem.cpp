@@ -42,9 +42,37 @@ static int NAME( lua_State * const L ) noexcept\
 #define END_PROTECTED_FUNCTION\
     END_TRY\
 }
-
 namespace pg
 {
+
+#if LUA_VERSION_NUM < 504
+
+// Based on the sources of Lua 5.4
+int type_error( lua_State *L, int arg, const char *tname )
+{
+    const auto typearg = [ L, arg ]
+    {  /* name for the type of the actual argument */
+        if( luaL_getmetafield( L, arg, "__name" ) == LUA_TSTRING )
+        {
+            return lua_tostring(L, -1);  /* use the given type name */
+        }
+        if( lua_type( L, arg ) == LUA_TLIGHTUSERDATA )
+        {
+            return "light userdata";  /* special name for messages */
+        }
+        return luaL_typename( L, arg );  /* standard name */
+    };
+
+    const char *msg = lua_pushfstring( L, "%s expected, got %s", tname, typearg() );
+    return luaL_argerror( L, arg, msg );
+}
+
+#else
+
+const auto& type_error = luaL_typeerror;
+
+#endif
+
 
 using path_iterator                = std::pair< std::filesystem::path::iterator, const std::filesystem::path::iterator >;
 using directory_iterator           = std::pair< std::filesystem::directory_iterator, const std::filesystem::directory_iterator >;
@@ -154,7 +182,7 @@ T & check_user_data_arg( lua_State * L, int arg, const char * tname = meta_trait
     auto path = pg::test_user_data< T >( L, arg );
     if( !path ) PG_UNLIKELY
     {
-        luaL_typeerror( L, arg, tname );
+        pg::type_error( L, arg, tname );
     }
 
     return *path;
@@ -179,7 +207,7 @@ T & new_user_data( lua_State * const L, A&&... args )
 {
     lua_checkstack( L, 2 );
 
-    auto buffer    = lua_newuserdatauv( L, sizeof( T ), 0 );
+    auto buffer    = lua_newuserdata( L, sizeof( T ) );
     auto user_data = new( buffer ) T( std::forward< A >( args )... );
 
     luaL_getmetatable( L, meta_traits< T >::id );
@@ -193,7 +221,7 @@ int return_new_user_data( lua_State * const L, A&&... args )
 {
     lua_checkstack( L, 2 );
 
-    auto buffer = lua_newuserdatauv( L, sizeof( T ), 0 );
+    auto buffer = lua_newuserdata( L, sizeof( T ) );
     new( buffer ) T( std::forward< A >( args )... );
 
     luaL_getmetatable( L, meta_traits< T >::id );
@@ -671,7 +699,7 @@ BEGIN_FUNCTION( ft_add )
     }
     else
     {
-        return luaL_typeerror( L, 2, "number or integer" );
+        return pg::type_error( L, 2, "number or integer" );
     }
 END_FUNCTION
 
@@ -1135,7 +1163,7 @@ BEGIN_PROTECTED_FUNCTION( fs_make_directory_entry )
     case LUA_TFUNCTION:
     case LUA_TTHREAD:
     case LUA_TLIGHTUSERDATA:
-        luaL_typeerror( L, 1, "directory entry, path, string or nil" );
+        pg::type_error( L, 1, "directory entry, path, string or nil" );
     }
 
     if( type == LUA_TNIL || type == LUA_TNONE )
@@ -1181,7 +1209,7 @@ BEGIN_PROTECTED_FUNCTION( fs_make_path )
     case LUA_TFUNCTION:
     case LUA_TTHREAD:
     case LUA_TLIGHTUSERDATA:
-        luaL_typeerror( L, 1, "path, string or nil" );
+        pg::type_error( L, 1, "path, string or nil" );
     }
 
     if( type == LUA_TNIL || type == LUA_TNONE )

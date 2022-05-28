@@ -327,7 +327,7 @@ Its members support binary operators to combine, mask or check the options.
 
 Checks if path `p` corresponds to an existing file or directory.
 
-### `equivalent( p1, p2 )
+### `equivalent( p1, p2 )`
 
 Checks if the paths `p1` and `p2` resolve to the same file system entity.
 
@@ -380,7 +380,7 @@ The supported file types are;
 | `socket`    | A socket file |
 | `unknown`   | The file exists but its type could not be determined |
 
-Depending on the implementation and platform the `file_type` returned by functions may nothold a value that is not listed.
+Depending on the implementation and platform the `file_type` returned by functions may hold a value that is not listed.
 
 ### `hard_link_count( p )`
 
@@ -470,6 +470,18 @@ The options support binary operators to combine, mask or check options.
 | `add`      | Permissions will be replaced by the bitwise OR of the argument and the current permissions |
 | `remove`   | Permissions will be replaced by the bitwise AND of the negated argument and current permissions |
 | `nofollow` | Permissions will be changed on the symlink itself, rather than on the file it resolves to |
+
+You can only combine `replace`, `add` or `remove` with `nofollow` or else the behavior of the permissions function is undefined.
+
+``` lua
+local fs = require( "filesystem" )
+
+local undefined_1 = fs.perm_options.replace | fs.perm_options.add
+local undefined_2 = fs.perm_options.add | fs.perm_options.remove
+
+local okay_1 = fs.perm_options.replace | fs.perm_options.nofollow
+local okay_2 = fs.perm_options.remove | fs.perm_options.nofollow
+```
 
 ### `path( [p] )`
 

@@ -324,12 +324,12 @@ end
 
 local function _is_absolute()
     local p1 = fs.path()
-    local p2 = fs.path( "/" )
-    local p3 = fs.path( "/home" )
+    local p2 = fs.path( fs.current_path():root_path() )
+    local p3 = fs.path( fs.current_path():make_preferred() )
     local p4 = fs.path( ".." )
     local p5 = fs.path( "foo/bar" )
     local p6 = fs.path( "../foo" )
-    local p7 = fs.path( "/home/foo/../bar" )
+    local p7 = fs.path( fs.current_path():make_preferred():append( "/../bar" ) )
 
     test.is_false( p1:is_absolute() )
     test.is_true( p2:is_absolute() )
@@ -342,12 +342,12 @@ end
 
 local function _is_relative()
     local p1 = fs.path()
-    local p2 = fs.path( "/" )
-    local p3 = fs.path( "/home" )
+    local p2 = fs.path( fs.current_path():root_path() )
+    local p3 = fs.path( fs.current_path():make_preferred() )
     local p4 = fs.path( ".." )
     local p5 = fs.path( "foo/bar" )
     local p6 = fs.path( "../foo" )
-    local p7 = fs.path( "/home/foo/../bar" )
+    local p7 = fs.path( fs.current_path():make_preferred():append( "/../bar" ) )
 
     test.is_true( p1:is_relative() )
     test.is_false( p2:is_relative() )

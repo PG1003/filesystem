@@ -1,6 +1,9 @@
 local test = require( "test" )
 local fs   = require( "filesystem" )
 
+local function _current_test_path( str )
+    return tostring( fs.current_path():append( str ):make_preferred() )
+end
 
 local function _absolute()
     local p1 = fs.path( "." )
@@ -106,12 +109,12 @@ local function _create_directory()
 end
 
 local function _create_directories_remove_all()
-    local dir = "./test/tests/bar/baz/"
+    local dir = _current_test_path( "test/tests/bar/baz" )
 
     test.is_true( fs.create_directories( dir ) )
     test.is_true( fs.exists( dir ) )
 
-    fs.remove_all( "./test/tests/bar" )
+    fs.remove_all( _current_test_path( "./test/tests/bar" ) )
     test.is_false( fs.exists( dir ) )
 end
 
@@ -149,11 +152,11 @@ local function _current_path()
 end
 
 local function _equivalent()
-    local p1 = fs.path( "./test/tests/foo/file.txt" )
-    local p2 = "././test/../test/tests/foo/file.txt"
+    local p1 = fs.path( _current_test_path( "test/tests/foo/file.txt" ) )
+    local p2 = _current_test_path( "././test/../test/tests/foo/file.txt" )
 
     test.is_true( fs.equivalent( p1, p2 ) )
-    test.is_false( fs.equivalent( p1, "./test/tests/foo" ) )
+    test.is_false( fs.equivalent( p1, _current_test_path( "test/tests/foo/bar" ) ) )
 end
 
 local function _file_size_resize()
@@ -216,7 +219,7 @@ local function _temp_directory_path()
 end
 
 local function _last_write_time()
-    local str = "./test/tests/foo/file.txt"
+    local str = _current_test_path( "test/tests/foo/file.txt" )
     local p   = fs.path( str )
     local ft1 = fs.last_write_time( str )
     local ft2 = fs.last_write_time( p )
@@ -249,14 +252,14 @@ local function _file_time_now()
 end
 
 local function _is_xyz()
-    local p1 = fs.path( "./test/tests/foo/" )
+    local p1 = _current_test_path( "test/tests/foo/" )
     test.is_false( fs.is_block_file( p1 ) )
     test.is_false( fs.is_character_file( p1 ) )
     test.is_true( fs.is_directory( p1 ) )
     test.is_false( fs.is_fifo( p1 ) )
     test.is_false( fs.is_other( p1 ) )
 
-    local p2 = fs.path( "./test/tests/foo/file.txt" )
+    local p2 = _current_test_path( "./test/tests/foo/file.txt" )
     test.is_true( fs.is_regular_file( p2 ) )
     test.is_false( fs.is_socket( p2 ) )
     test.is_false( fs.is_symlink( p2 ) )

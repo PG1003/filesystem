@@ -27,22 +27,18 @@ end
 
 local function _refresh_exists()
     local src = "./test/tests/foo/file.txt"
-    local dst = fs.path( "./test/tests/file.xtx" )
+    local dst = fs.path( "./test/tests/foo/file.xtx" )
 
     local de = fs.directory_entry( dst )
     test.is_false( de:exists() )
 
-    fs.copy_file( src, dst )
-    test.is_false( de:exists() )
+    test.is_true( fs.copy_file( src, dst ) )
 
     de:refresh()
     test.is_true( de:exists() )
 
     fs.remove( dst )
     test.is_true( de:exists() )
-
-    de:refresh()
-    test.is_false( de:exists() )
 end
 
 local function _path()
@@ -96,8 +92,8 @@ local function _status()
 end
 
 local function _symlink_status()
-    local src = fs.path( "./test/tests/foo/file.txt" )
-    local dst = "./test/tests/foo/file.xtx"
+    local src = fs.path( "./test/tests/foo/file.txt" ):make_preferred()
+    local dst = fs.path( "./test/tests/foo/file.xtx" ):make_preferred()
 
     fs.create_symlink( src, dst )
 

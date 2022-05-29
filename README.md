@@ -7,9 +7,9 @@ A filesystem Lua module based on the std::filesystem C++ standard library.
 The filesystem module supports the same features as std::filesystem does.  
 This includes the following;
 * File operations such as copy, remove and renaming.
-* Iterating (recursively) through direcotries.
+* Iterating (recursively) through directories.
 * Create and remove symbolic links and hard links.
-* Querying information about a file like permissions and type of a filesystem entity.
+* Querying permissions and the type of a filesystem entry.
 * Modifying permissions.
 
 ## Requirements
@@ -110,8 +110,7 @@ This library has only [one cpp-file](/src/filesystem.cpp) without external depen
 
 ## Tests
 
-There are tests to validate the Lua API of the filesystem module.
-However, these tests are written with a Linux OS in mind, so there is no guaranty that all test will pass on other platforms.
+There are tests to validate the Lua API of the filesystem module and should run on Unix-like OSs and Windows.
 
 You can find these tests in the [tests](/test/tests) directory.
 

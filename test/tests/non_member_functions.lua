@@ -265,6 +265,14 @@ local function _is_xyz()
     test.is_false( fs.is_symlink( p2 ) )
 end
 
+local function _enum_binary_operators()
+    local all  = fs.perms.all
+    local none = all & ~all
+
+    test.is_same( none, fs.perms.none )
+    test.is_same( none | all, fs.perms.all )
+end
+
 local tests =
 {
     absolute                        = _absolute,
@@ -289,7 +297,8 @@ local tests =
     temp_directory_path             = _temp_directory_path,
     last_write_time                 = _last_write_time,
     file_time_now                   = _file_time_now,
-    is_xyzz                         = _is_xyz
+    is_xyzz                         = _is_xyz,
+    enum_binary_operators           = _enum_binary_operators
 }
 
 return tests

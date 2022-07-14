@@ -51,16 +51,20 @@ namespace pg
 int type_error( lua_State *L, int arg, const char *tname )
 {
     const auto typearg = [ L, arg ]
-    {  /* name for the type of the actual argument */
+    {
+        // Name for the type of the actual argument
         if( luaL_getmetafield( L, arg, "__name" ) == LUA_TSTRING )
         {
-            return lua_tostring(L, -1);  /* use the given type name */
+            // Use the given type name 
+            return lua_tostring( L, -1 );
         }
         if( lua_type( L, arg ) == LUA_TLIGHTUSERDATA )
         {
-            return "light userdata";  /* special name for messages */
+            // Special name for messages
+            return "light userdata";
         }
-        return luaL_typename( L, arg );  /* standard name */
+        // Standard name
+        return luaL_typename( L, arg );
     };
 
     const char *msg = lua_pushfstring( L, "%s expected, got %s", tname, typearg() );
@@ -167,7 +171,7 @@ template<>
 struct meta_traits< std::filesystem::file_time_type >
 {
     static constexpr auto       id     = file_time_type_meta_traits;
-    static constexpr const char name[] = "file time type";
+    static constexpr const char name[] = "file_time_type";
 };
 
 template< typename T >

@@ -1,6 +1,6 @@
 # filesystem for Lua - Reference
 
-This reference is based on the [cppreference.com filesystem](https://en.cppreference.com/w/cpp/filesystem) documentation. cppreference provides a more detailed explanation regarding the implementation and edge cases of functions that are made available by this module to Lua.
+This reference is based on the [cppreference.com filesystem](https://en.cppreference.com/w/cpp/filesystem) documentation. Cppreference provides a more detailed explanation regarding the implementation and edge cases of functions that are made available by this module to Lua.
 
 The names of the functions and objects used by the API of this Lua modules are equivalent to the functions, enums and objects as specified for the C++ `std::filesystem` library.
 
@@ -194,7 +194,7 @@ Portable code should use this function to create directory symlinks rather than 
 
 ### `create_symlink( target, link )`
 
-Creates a symbolic link `link` with its target set to `target` as if by POSIX symlink(): the pathname target may be invalid or non-existing.
+Creates a symbolic link `link` with its target set to `target` as if by POSIX `symlink()`: the pathname target may be invalid or non-existing.
 
 ### `current_path( [p] )`
 
@@ -290,11 +290,11 @@ Returns the (cached) time of the last data modification of the file to which `di
 
 ### `directory_entry:status()`
 
-Returns a `perms` and a `file_type` of the file to which `directory_entry` refers.
+Returns a [`permissions`](#perms) and a [`file type`](#file_type) of the file to which `directory_entry` refers.
 
 ### `directory_entry:symlink_status()`
 
-Returns a `perms` and a `file_type` of the symbolic link to which `directory_entry` refers.
+Returns a [`permissions`](#perms) and a [`file type`](#file_type) of the symbolic link to which `directory_entry` refers.
 
 ### `directory( p, [directory_options] )`
 
@@ -720,7 +720,7 @@ Returns 3 values, in order;
 
 ### `status( p )`
 
-Returns the permissions and type (in that order) of the filesystem entity refered by `p`.
+Returns the [`permissions`](#perms) and [`file type`](#file_type) (in that order) of the filesystem entity refered by `p`.
 Symbolic links are followed.
 
 ### `status_known( p )`
@@ -729,7 +729,7 @@ Tests if the file status of `p` is known.
 
 ### `symlink_status( p )`
 
-Returns the permissions and type (in that order) of the symbolic link refered by `p`.
+Returns the [`permissions`](#perms) and [`file type`](#file_type) (in that order) of the symbolic link refered by `p`.
 
 ### `temp_directory_path()`
 

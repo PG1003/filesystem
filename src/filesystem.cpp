@@ -34,14 +34,28 @@ static int NAME( lua_State * const L ) noexcept\
 
 #define END_FUNCTION    }
 
-#define BEGIN_PROTECTED_FUNCTION( NAME )\
-static int NAME( lua_State * const L ) noexcept\
+// This workaround fixes a crash that was found while running the tests when module is built
+// by Visual Studio 17.4 using Clang tools for Windows 15.0.1.
+// 
+// Note that the noexcept specifier is omitted. Somehow terminate() was called from a function
+// that catches all exceptions but doesn't throw any. Maybe the compiler got confused by the
+// Lua error handling but could not reproduce this at compiler explorer.
+#if defined( __clang__ ) && defined( _WIN32 )
+# define BEGIN_PROTECTED_FUNCTION( NAME )\
+static int NAME( lua_State * const L ) \
 {\
     BEGIN_TRY
+#else
+# define BEGIN_PROTECTED_FUNCTION( NAME )\
+static int NAME( lua_State * const L ) noexcept \
+{\
+    BEGIN_TRY
+#endif
 
 #define END_PROTECTED_FUNCTION\
     END_TRY\
 }
+
 namespace pg
 {
 

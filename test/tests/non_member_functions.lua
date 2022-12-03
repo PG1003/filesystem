@@ -229,26 +229,91 @@ local function _last_write_time()
 
     local ft3 = fs.file_time_now()
     fs.last_write_time( p, ft3 )
-    
-    test.is_not_same( fs.last_write_time( p ), ft2 )
-    test.is_same( fs.last_write_time( str ), ft3 )
 
-    local ft4 = ft3 - 1
-    test.is_same( ft3 - ft4, 1 )
+    test.is_not_same( fs.last_write_time( p ), ft2 )
+    test.is_same( fs.last_write_time( p ), ft3 )
+end
+
+local function _file_time()
+    local ft1 = fs.file_time_now()
+
+    local ft2 = ft1 + 1
+    local ft3 = ft1 - 1
+    test.is_true( ft2 > ft1 )
+    test.is_true( ft2 >= ft1 )
+    test.is_true( ft3 < ft1 )
+    test.is_true( ft3 <= ft1 )
+    test.is_not_same( ft2 ~= ft3 )
+
+    local ft4 = ft1 + 1.0
+    local ft5 = ft1 - 1.0
+    test.is_true( ft4 > ft1 )
+    test.is_true( ft4 >= ft1 )
+    test.is_true( ft5 < ft1 )
+    test.is_true( ft5 <= ft1 )
+    test.is_not_same( ft4, ft5 )
+
+    local dif = ft4 - ft5
+    local ft6 = dif + ft1
+    local ft7 = ft1 + dif
+    local ft8 = ft1 - dif
+    test.is_same( ft6, ft7 )
+    test.is_true( ft8 < ft1 )
 end
 
 local function _file_time_now()
     local ft1 = fs.file_time_now()
 
-    local ft2 = fs.last_write_time( "./test/tests/foo/file.txt" )
+    local ft2 = fs.last_write_time( "./test/tests/foo/bar/file.txt" )
     test.is_true( ft1 > ft2 )
     test.is_true( ft1 >= ft2 )
     test.is_false( ft1 < ft2 )
     test.is_false( ft1 <= ft2 )
+end
 
-    local diff = ft1 - ft2
-    test.is_true( diff > 0 )
-    test.is_same( ft1, ft2 + diff )
+local function _file_time_duraion()
+    local ft1 = fs.file_time_now()
+    local ft2 = fs.last_write_time( "./test/tests/foo/bar/file.txt" )
+
+    local diff1 = ft1 - ft2
+    test.is_same( ft1, ft2 + diff1 )
+    test.is_same( ft1, diff1 + ft2 )
+    test.is_same( ft2, ft1 - diff1 )
+
+    local diff2 = ft2 - ft1
+    test.is_same( ft2, ft1 + diff2 )
+    test.is_same( ft2, diff2 + ft1 )
+    test.is_same( ft1, ft2 + diff1 )
+
+    local diff3 = diff1 + 1.0
+    local diff4 = diff1 + 1
+    local diff5 = 1.0 + diff1
+    local diff6 = 1 + diff1
+    test.is_true( diff3 > diff1 )
+    test.is_true( diff3 >= diff1 )
+    test.is_true( diff4 > diff1 )
+    test.is_true( diff4 >= diff1 )
+    test.is_true( diff5 > diff1 )
+    test.is_true( diff6 > diff1 )
+    test.is_same( diff3, diff4 )
+    test.is_same( diff3, diff5 )
+    test.is_same( diff3, diff6 )
+
+    local diff7 = diff1 - 1.0
+    local diff8 = diff1 - 1
+    test.is_true( diff7 < diff1 )
+    test.is_true( diff7 <= diff1 )
+    test.is_true( diff8 < diff1 )
+    test.is_true( diff8 <= diff1 )
+    test.is_not_same( diff1, diff8 )
+    test.is_same( diff7, diff8 )
+
+    local diff9   = diff1 - diff8
+    local diff10  = diff9 + diff1
+    local diff11  = diff1 + diff9
+    local seconds = diff9:seconds()
+    test.is_same( diff10, diff11 )
+    test.is_same( seconds, 1 )
 end
 
 local function _is_xyz()
@@ -296,7 +361,9 @@ local tests =
     space                           = _space,
     temp_directory_path             = _temp_directory_path,
     last_write_time                 = _last_write_time,
+    file_time                       = _file_time,
     file_time_now                   = _file_time_now,
+    file_time_duraion               = _file_time_duraion,
     is_xyzz                         = _is_xyz,
     enum_binary_operators           = _enum_binary_operators
 }

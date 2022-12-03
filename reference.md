@@ -42,6 +42,8 @@ The names of the functions and objects used by the API of this Lua modules are e
 [equivalent](#equivalent-p1-p2-)  
 [file_size](#file_size-p-)  
 [file_time](#file_time) (object)  
+[file_time_duration](#file_time_duration) (object)  
+[file_time_duration:seconds](#file_time_duration_seconds)  
 [file_time_now](#file_time_now) (none std::filesystem)  
 [file_type](#file_type) (enum)  
 [hard_link_count](#hard_link_count-p-)  
@@ -341,8 +343,8 @@ The size of a directory (as well as any other file that is not a regular file or
 An object that holds the time modified when returned by [`last_write_time`](#last_write_time-p-new_time-) or [`directory_entry:last_write_time`](#directory_entrylast_write_time).
 When returned by [`file_time_now`](#file_time_now) it holds the time at the moment of the function call.
 
-The `file_time` object supports limited arithmatic such as subtracting two `file_time` objects to get a time difference (which is a regular Lua number).
-You can also add an offset (in seconds) to a `file_time` object.
+The `file_time` object supports limited arithmatic such as subtracting two `file_time` objects to get a time difference (which is a regular [`file_time_duration`](#file_time_duration) object).
+You can also add or subtract an offset (in seconds) or a `file_time_duration` to a `file_time` object.
 
 ``` lua
 local fs  = require( "filesystem" )
@@ -350,12 +352,22 @@ local p   = fs.path( "my_file.txt" )
 local ft  = fs.last_write_time( p )
 local now = fs.file_time_now()
 
--- calculate how many seconds ago the file was modified
-local modified_seconds_ago = now - ft
+-- calculate the duration since the file was modified
+local duration = now - ft
 
 -- set new modified time one second ago
 fs.last_write_time( p, now - 1 )
 ```
+
+### `file_time_duration`
+
+An object that is created when subtracting one [`file_time`](#file_time) objects from another.  
+You can do limited arithmatic with `file_time_duration objects`; only adding and subtracting numbers, integeral values (both in seconds) and `file_time_duration` objects is supported.
+A `file_time_duration` can also be added to or subtracted from a `file_time`.
+
+### `file_fime_duration:seconds()
+
+Returns a Lua number that represents the duration in seconds.
 
 ### `file_time_now()`
 

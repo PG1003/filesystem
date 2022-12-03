@@ -88,15 +88,6 @@ function test.is_not_same( value_1, value_2 )
     return true
 end
 
-function test.raises_error( func )
-    _total_checks = _total_checks + 1
-    if pcall( func ) then
-        _report_fail( "Expect to error" )
-        return false
-    end
-    return true
-end
-
 function test.run_test_modules( test_modules )
     print( "Running tests..." )
     assert( type( test_modules ) == "table" )

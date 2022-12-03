@@ -3,10 +3,7 @@
 #include <lua.hpp>
 #include <filesystem>
 #include <string_view>
-#include <utility>
 #include <cassert>
-
-#include <iostream>
 
 #if defined( _WIN32 )
 # define EXPORT __declspec( dllexport )
@@ -107,6 +104,7 @@ static constexpr const char perms_meta_traits[]                        = "perms.
 static constexpr const char perm_options_meta_traits[]                 = "perm_options.filesystem";
 static constexpr const char file_type_meta_traits[]                    = "file_type.filesystem";
 static constexpr const char file_time_type_meta_traits[]               = "file_time_type.filesystem";
+static constexpr const char file_time_duration_type_meta_traits[]      = "file_time_duration_type.filesystem";
 
 template< typename >
 struct meta_traits {};
@@ -122,42 +120,42 @@ template<>
 struct meta_traits< path_iterator >
 {
     static constexpr auto       id     = path_iterator_meta_traits;
-    static constexpr const char name[] = "path iterator state";
+    static constexpr const char name[] = "path_iterator_state";
 };
 
 template<>
 struct meta_traits< directory_iterator >
 {
     static constexpr auto       id     = directory_iterator_meta_traits;
-    static constexpr const char name[] = "directory iterator state";
+    static constexpr const char name[] = "directory_iterator_state";
 };
 
 template<>
 struct meta_traits< recursive_directory_iterator >
 {
     static constexpr auto       id     = recursive_directory_iterator_meta_traits;
-    static constexpr const char name[] = "recursive directory iterator state";
+    static constexpr const char name[] = "recursive_directory_iterator_state";
 };
 
 template<>
 struct meta_traits< std::filesystem::directory_entry >
 {
     static constexpr auto       id     = directory_entry_meta_traits;
-    static constexpr const char name[] = "directory entry";
+    static constexpr const char name[] = "directory_entry";
 };
 
 template<>
 struct meta_traits< std::filesystem::directory_options >
 {
     static constexpr auto       id     = directory_options_meta_traits;
-    static constexpr const char name[] = "directory options";
+    static constexpr const char name[] = "directory_options";
 };
 
 template<>
 struct meta_traits< std::filesystem::copy_options >
 {
     static constexpr auto       id     = copy_options_meta_traits;
-    static constexpr const char name[] = "copy options";
+    static constexpr const char name[] = "copy_options";
 };
 
 template<>
@@ -171,21 +169,28 @@ template<>
 struct meta_traits< std::filesystem::perm_options >
 {
     static constexpr auto       id     = perm_options_meta_traits;
-    static constexpr const char name[] = "permission options";
+    static constexpr const char name[] = "permission_options";
 };
 
 template<>
 struct meta_traits< std::filesystem::file_type >
 {
     static constexpr auto       id     = file_type_meta_traits;
-    static constexpr const char name[] = "file type";
+    static constexpr const char name[] = "file_type";
 };
 
 template<>
 struct meta_traits< std::filesystem::file_time_type >
 {
     static constexpr auto       id     = file_time_type_meta_traits;
-    static constexpr const char name[] = "file_time_type";
+    static constexpr const char name[] = "file_time";
+};
+
+template<>
+struct meta_traits< std::filesystem::file_time_type::duration >
+{
+    static constexpr auto       id     = file_time_duration_type_meta_traits;
+    static constexpr const char name[] = "file_time_duration";
 };
 
 template< typename T >
@@ -701,7 +706,11 @@ BEGIN_FUNCTION( ft_add )
 
     const auto & self = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 1 );
 
-    if( lua_isinteger( L, 2 ) )
+    if( auto right = pg::test_user_data< duration >( L, 2 ) )
+    {
+        return pg::return_new_user_data< std::filesystem::file_time_type >( L, self + *right );
+    }
+    else if( lua_isinteger( L, 2 ) )
     {
         const auto seconds = static_cast< rep >( lua_tointeger( L, 2 ) );
         const auto count   = seconds * period::den / period::num;
@@ -717,7 +726,7 @@ BEGIN_FUNCTION( ft_add )
     }
     else
     {
-        return pg::type_error( L, 2, "number or integer" );
+        return pg::type_error( L, 2, "file time duration, number or integer" );
     }
 END_FUNCTION
 
@@ -726,23 +735,24 @@ BEGIN_FUNCTION( ft_sub )
     using period   = std::filesystem::file_time_type::period;
     using rep      = std::filesystem::file_time_type::rep;
 
-    const auto & left  = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 1 );
-    if( lua_isnumber( L, 2 ) )
+    const auto & self  = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 1 );
+
+    if( auto right_duration = pg::test_user_data< duration >( L, 2 ) )
+    {
+        return pg::return_new_user_data< std::filesystem::file_time_type >( L, self - *right_duration );
+    }
+    else if( lua_isnumber( L, 2 ) )
     {
         const auto seconds = lua_tonumber( L, 2 );
         const auto count   = static_cast< rep >( seconds * period::den / period::num );
         
-        return pg::return_new_user_data< std::filesystem::file_time_type >( L, left - duration( count ) );
+        return pg::return_new_user_data< std::filesystem::file_time_type >( L, self - duration( count ) );
     }
     else
     {
-        const auto & right = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 2, "file_time or number" );
+        const auto & right_file_time = pg::check_user_data_arg< std::filesystem::file_time_type >( L, 2, "number, file time or file time duration" );
 
-        const auto count     = ( left - right ).count();
-        const auto count_num = static_cast< lua_Number >( count * std::filesystem::file_time_type::period::num );
-        const auto seconds   = count_num / std::filesystem::file_time_type::period::den;
-
-        return pg::return_number( L, seconds );
+        return pg::return_new_user_data< duration >( L, self - right_file_time );
     }
 END_FUNCTION
 
@@ -750,16 +760,163 @@ struct fs_file_time
 {
     static constexpr const luaL_Reg operators[] =
     {
-        { "__gc",       ft_gc },
-        { "__eq",       ft_eq },
-        { "__lt",       ft_lt },
-        { "__le",       ft_le },
-        { "__add",      ft_add },
-        { "__sub",      ft_sub },
-        { NULL,         NULL }
+        { "__gc",  ft_gc },
+        { "__eq",  ft_eq },
+        { "__lt",  ft_lt },
+        { "__le",  ft_le },
+        { "__add", ft_add },
+        { "__sub", ft_sub },
+        { NULL,    NULL }
     };
 
     static constexpr const luaL_Reg * methods = nullptr;
+};
+
+BEGIN_FUNCTION( ftd_gc )
+    auto & self = pg::to_user_data< std::filesystem::file_time_type::duration >( L, 1 );
+
+    typedef std::filesystem::file_time_type::duration file_time_type;
+    self.~file_time_type();
+
+    return 0;
+END_FUNCTION
+
+BEGIN_FUNCTION( ftd_eq )
+    const auto & left  = pg::check_user_data_arg< std::filesystem::file_time_type::duration >( L, 1 );
+    const auto & right = pg::check_user_data_arg< std::filesystem::file_time_type::duration >( L, 2 );
+
+    return pg::return_boolean( L, left == right );
+END_FUNCTION
+
+BEGIN_FUNCTION( ftd_lt )
+    const auto & left  = pg::check_user_data_arg< std::filesystem::file_time_type::duration >( L, 1 );
+    const auto & right = pg::check_user_data_arg< std::filesystem::file_time_type::duration >( L, 2 );
+
+    return pg::return_boolean( L, left < right );
+END_FUNCTION
+
+BEGIN_FUNCTION( ftd_le )
+    const auto & left  = pg::check_user_data_arg< std::filesystem::file_time_type::duration >( L, 1 );
+    const auto & right = pg::check_user_data_arg< std::filesystem::file_time_type::duration >( L, 2 );
+
+    return pg::return_boolean( L, left <= right );
+END_FUNCTION
+
+BEGIN_FUNCTION( ftd_add )
+    using duration = std::filesystem::file_time_type::duration;
+    using period   = std::filesystem::file_time_type::period;
+    using rep      = std::filesystem::file_time_type::rep;
+
+    if( const auto self = pg::test_user_data< duration >( L, 1 ) )
+    {
+        if( const auto right_duration = pg::test_user_data< duration >( L, 2 ) )
+        {
+            return pg::return_new_user_data< duration >( L, *self + *right_duration );
+        }
+        else if( const auto right_file_time = pg::test_user_data< std::filesystem::file_time_type >( L, 2 ) )
+        {
+            return pg::return_new_user_data< std::filesystem::file_time_type >( L, *self + *right_file_time );
+        }
+        else if( lua_isinteger( L, 2 ) )
+        {
+            const auto seconds = static_cast< rep >( lua_tointeger( L, 2 ) );
+            const auto count   = seconds * period::den / period::num;
+
+            return pg::return_new_user_data< duration >( L, *self + duration( count ) );
+        }
+        else if( lua_isnumber( L, 2 ) )
+        {
+            const auto seconds = lua_tonumber( L, 2 );
+            const auto count   = static_cast< rep >( seconds * period::den / period::num );
+
+            return pg::return_new_user_data< duration >( L, *self + duration( count ) );
+        }
+        else
+        {
+            return pg::type_error( L, 2, "file time duration, number or integer" );
+        }
+    }
+    else
+    {
+        const auto right = pg::check_user_data_arg< duration >( L, 2 );
+
+        if( lua_isinteger( L, 1 ) )
+        {
+            const auto seconds = static_cast< rep >( lua_tointeger( L, 1 ) );
+            const auto count   = seconds * period::den / period::num;
+
+            return pg::return_new_user_data< duration >( L, duration( count ) + right );
+        }
+        else if( lua_isnumber( L, 1 ) )
+        {
+            const auto seconds = lua_tonumber( L, 1 );
+            const auto count   = static_cast< rep >( seconds * period::den / period::num );
+
+            return pg::return_new_user_data< duration >( L, duration( count ) + right );
+        }
+        else
+        {
+            return pg::type_error( L, 1, "file time duration, number or integer" );
+        }
+    }
+END_FUNCTION
+
+BEGIN_FUNCTION( ftd_sub )
+    using duration = std::filesystem::file_time_type::duration;
+    using period   = std::filesystem::file_time_type::period;
+    using rep      = std::filesystem::file_time_type::rep;
+
+    const auto & self = pg::check_user_data_arg< duration >( L, 1 );
+
+    if( lua_isinteger( L, 2 ) )
+    {
+        const auto seconds = lua_tointeger( L, 2 );
+        const auto count   = seconds * period::den / period::num;
+
+        return pg::return_new_user_data< duration >( L, self - duration( count ) );
+    }
+    else if( lua_isnumber( L, 2 ) )
+    {
+        const auto seconds = lua_tonumber( L, 2 );
+        const auto count   = static_cast< rep >( seconds * period::den / period::num );
+
+        return pg::return_new_user_data< duration >( L, self - duration( count ) );
+    }
+    else
+    {
+        const auto right = pg::check_user_data_arg< duration >( L, 2, "number, file time or file time duration" );
+
+        return pg::return_new_user_data< duration >( L, self - right );
+    }
+END_FUNCTION
+
+BEGIN_FUNCTION( ftd_seconds )
+    const auto & duration = pg::check_user_data_arg< std::filesystem::file_time_type::duration >( L, 1 );
+
+    const auto count_num = static_cast< lua_Number >( duration.count() ) * std::filesystem::file_time_type::period::num;
+    const auto seconds   = count_num / std::filesystem::file_time_type::period::den;
+
+    return pg::return_number( L, seconds );
+END_FUNCTION
+
+struct fs_file_time_duration
+{
+    static constexpr const luaL_Reg operators[] =
+    {
+        { "__gc",  ftd_gc },
+        { "__eq",  ftd_eq },
+        { "__lt",  ftd_lt },
+        { "__le",  ftd_le },
+        { "__add", ftd_add },
+        { "__sub", ftd_sub },
+        { NULL,    NULL }
+    };
+
+    static constexpr const luaL_Reg methods[] =
+    {
+        { "seconds", ftd_seconds },
+        { NULL,      NULL }
+    };
 };
 
 BEGIN_FUNCTION( de_to_string )
@@ -1985,6 +2142,7 @@ EXPORT int luaopen_filesystem( lua_State * const L ) noexcept
     register_metatable( L, pg::perm_options_meta_traits,                 fs_perm_options::operators,                    fs_perm_options::methods );
     register_metatable( L, pg::file_type_meta_traits,                    fs_file_type::operators,                       fs_file_type::methods );
     register_metatable( L, pg::file_time_type_meta_traits,               fs_file_time::operators,                       fs_file_time::methods );
+    register_metatable( L, pg::file_time_duration_type_meta_traits,      fs_file_time_duration::operators,              fs_file_time_duration::methods );
 
     luaL_checkversion( L );
     lua_newtable( L );

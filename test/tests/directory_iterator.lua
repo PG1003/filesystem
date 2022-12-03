@@ -9,6 +9,7 @@ local _test_paths = {
     [ _current_test_path( "test/tests/foo/baz" ) ] = 0,
     [ _current_test_path( "test/tests/foo/baz/file.txt" ) ] = 1,
     [ _current_test_path( "test/tests/foo/bar" ) ] = 0,
+    [ _current_test_path( "test/tests/foo/bar/file.txt" ) ] = 1,
     [ _current_test_path( "test/tests/foo/bar/buz" ) ] = 1,
     [ _current_test_path( "test/tests/foo/bar/buz/plik.txt" ) ] = 2,
     [ _current_test_path( "test/tests/foo/bar/buz/fil.txt" ) ] = 2,

@@ -43,7 +43,7 @@ The names of the functions and objects used by the API of this Lua modules are e
 [file_size](#file_size-p-)  
 [file_time](#file_time) (object)  
 [file_time_duration](#file_time_duration) (object)  
-[file_time_duration:seconds](#file_time_duration_seconds)  
+[file_time_duration:seconds](#file_time_durationseconds)  
 [file_time_now](#file_time_now) (none std::filesystem)  
 [file_type](#file_type) (enum)  
 [hard_link_count](#hard_link_count-p-)  
@@ -365,7 +365,7 @@ An object that is created when subtracting one [`file_time`](#file_time) objects
 You can do limited arithmatic with `file_time_duration objects`; only adding and subtracting numbers, integeral values (both in seconds) and `file_time_duration` objects is supported.
 A `file_time_duration` can also be added to or subtracted from a `file_time`.
 
-### `file_fime_duration:seconds()
+### `file_fime_duration:seconds()`
 
 Returns a Lua number that represents the duration in seconds.
 

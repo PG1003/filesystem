@@ -91,8 +91,8 @@ local success, result = pcall( may_fail, "/home/foo/bar.txt", "/home/foo/baz.txt
 
 -- No errors occured when 'success' is true. In this case 'result' contains
 --   the return value of 'may_fail' which in this example returns nothing.
--- If 'success' is false then an error occured and 'result' an error message
---   when the error was caused by the filesystem module.
+-- If 'success' is false then an error occured and 'result' is a message
+--   with information about error that hapend.
 
 if not success then
     print( result )
@@ -106,7 +106,7 @@ You can build the module by executing the following command in the project direc
 make all
 ```
 
-This library has only [one cpp-file](/src/filesystem.cpp) without external dependencies which makes easy to integrate it into other projects or your own build system.
+This library has only [one cpp-file](/src/filesystem.cpp) without external dependencies besides Lua which that simplifies integration into other projects or your own build system.
 
 ## Tests
 

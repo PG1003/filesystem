@@ -1,6 +1,6 @@
 # filesystem for Lua - Reference
 
-This reference is based on the [cppreference.com filesystem](https://en.cppreference.com/w/cpp/filesystem) documentation. Cppreference provides a more detailed explanation regarding the implementation and edge cases of functions that are made available by this module to Lua.
+This reference is based on the [cppreference.com filesystem](https://en.cppreference.com/w/cpp/filesystem) documentation. Cppreference provides a more detailed explanation regarding the implementation and edge cases of functions that are made available to Lua by this module.
 
 The names of the functions and objects used by the API of this Lua modules are equivalent to the functions, enums and objects as specified for the C++ `std::filesystem` library.
 
@@ -97,7 +97,7 @@ The names of the functions and objects used by the API of this Lua modules are e
 [recursive_directory](#recursive_directory-p-directory_options-) (none std::filesystem)  
 [recursive_directory_iterator_state](#recursive_directory_iterator_state) (object, none std::filesystem)  
 [recursive_directory_iterator_state:depth](#recursive_directory_iterator_statedepth)  
-[recursive_directory_iterator_state:disable_recurion_pending](#recursive_directory_iterator_statedisable_recurion_pending)  
+[recursive_directory_iterator_state:disable_recursion_pending](#recursive_directory_iterator_statedisable_recursion_pending)
 [recursive_directory_iterator_state:options](#recursive_directory_iterator_stateoptions)  
 [recursive_directory_iterator_state:recursion_pending](#recursive_directory_iterator_staterecursion_pending)  
 [recursive_directory_iterator_state:pop](#recursive_directory_iterator_statepop)  
@@ -205,13 +205,13 @@ When called with `p`, `p` is set as the current path.
 
 ### `directory( p, [directory_options] )`
 
-Enables recusive over entries in a directory by using a generic for-loop.
+Enables iteration over entries in a directory by using a generic for-loop.
 The default for `directory_options` is `fs.directory_options.none`.
 
 ``` lua
 local fs = require( filesystem )
 
-for entry in fs.recursive_directory( "my_directory" ) do
+for entry in fs.directory( "my_directory" ) do
     print( entry )
 end
 ```
@@ -679,7 +679,7 @@ An object that controls the recursive direcotry iteration
 Returns the number of directories from the starting directory to the currently iterated directory, i.e. the current depth of the directory hierarchy.
 The starting directory has depth of 0, its subdirectories have depth 1, etc.
 
-### `recursive_directory_iterator_state:disable_recurion_pending()`
+### `recursive_directory_iterator_state:disable_recursion_pending()`
 
 Disables recursion to the currently referred subdirectory, if any.
 
